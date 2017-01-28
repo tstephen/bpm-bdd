@@ -1,24 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
-  <groupId>org.activiti</groupId>
-  <version>5.19.0.20160314</version>
-  <artifactId>activiti-bdd</artifactId>
-  <name>Activiti - BDD</name>
-  <description>Support for applying Behaviour Driven Development approach to Activiti</description>
-
+  <groupId>com.knowprocess.bpm</groupId>
+  <artifactId>bpm-bdd</artifactId>
+  <name>BPM BDD</name>
+  <description>Support for applying Behaviour Driven Development approach to BPM development with the Flowable BPM engine.</description>
+  <version>2.0.0-SNAPSHOT</version>
 
   <properties>
     <java.version>1.6</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <activiti.version>5.19.0</activiti.version>
+    <flowable.version>6.0.0-SNAPSHOT</flowable.version>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-engine</artifactId>
-      <version>${activiti.version}</version>
+      <groupId>org.flowable</groupId>
+      <artifactId>flowable-engine</artifactId>
+      <version>${flowable.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -27,16 +26,15 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.toxos.activiti</groupId>
-      <artifactId>
-        process-assertions
-      </artifactId>
-      <version>0.5.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.subethamail</groupId>
       <artifactId>subethasmtp-wiser</artifactId>
       <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -59,5 +57,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

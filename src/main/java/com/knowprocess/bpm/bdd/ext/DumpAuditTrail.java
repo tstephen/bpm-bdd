@@ -1,37 +1,37 @@
-package org.activiti.bdd.ext;
+package com.knowprocess.bpm.bdd.ext;
 
 import java.util.List;
 
-import org.activiti.bdd.ActivitiSpec;
-import org.activiti.bdd.ExternalAction;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricDetail;
-import org.activiti.engine.test.ActivitiRule;
+import com.knowprocess.bpm.bdd.BpmSpec;
+import com.knowprocess.bpm.bdd.ExternalAction;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricDetail;
+import org.flowable.engine.test.FlowableRule;
 
 public class DumpAuditTrail implements ExternalAction {
 
-    private final ActivitiRule activitiRule;
+    private final FlowableRule flowableRule;
 
     /**
-     * @param activitiRule
+     * @param flowableRule
      */
-    public DumpAuditTrail(ActivitiRule activitiRule) {
-        this.activitiRule = activitiRule;
+    public DumpAuditTrail(FlowableRule flowableRule) {
+        this.flowableRule = flowableRule;
     }
 
-    public void execute(ActivitiSpec spec) throws Exception {
+    public void execute(BpmSpec spec) throws Exception {
         System.out.println("Audit trail: ");
 
-        List<HistoricActivityInstance> activities = activitiRule
+        List<HistoricActivityInstance> flowablees = flowableRule
                 .getHistoryService().createHistoricActivityInstanceQuery()
                 .processInstanceId(spec.getProcessInstance().getId()).list();
 
-        for (HistoricActivityInstance hist : activities) {
+        for (HistoricActivityInstance hist : flowablees) {
             System.out.println(String.format("  : %1$s", hist));
         }
 
         System.out.println("Final data: ");
-        List<HistoricDetail> details = activitiRule
+        List<HistoricDetail> details = flowableRule
                 .getHistoryService().createHistoricDetailQuery()
                 .processInstanceId(spec.getProcessInstance().getId()).list();
 

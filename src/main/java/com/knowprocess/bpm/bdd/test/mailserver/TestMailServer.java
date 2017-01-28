@@ -1,4 +1,4 @@
-package org.activiti.bdd.test.mailserver;
+package com.knowprocess.bpm.bdd.test.mailserver;
 
 import static org.junit.Assert.assertTrue;
 

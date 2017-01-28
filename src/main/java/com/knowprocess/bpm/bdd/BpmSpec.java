@@ -11,12 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Activiti Behaviour Driven Development (BDD) library
+ * BPM Behaviour Driven Development (BDD) library
  * Copyright 2015 Tim Stephenson
  *
  *******************************************************************************/
-package org.activiti.bdd;
+package com.knowprocess.bpm.bdd;
 
+import static com.knowprocess.bpm.bdd.assertions.BpmAssert.assertProcessEnded;
+import static com.knowprocess.bpm.bdd.assertions.BpmAssert.assertProcessEndedAndInEndEvents;
+import static com.knowprocess.bpm.bdd.assertions.BpmAssert.assertProcessEndedAndInExclusiveEndEvent;
+import static com.knowprocess.bpm.bdd.assertions.BpmAssert.assertProcessVariableLatestValueEquals;
+import static com.knowprocess.bpm.bdd.assertions.BpmAssert.processEngine;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -34,29 +39,28 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.activiti.engine.ActivitiObjectNotFoundException;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.identity.User;
-import org.activiti.engine.impl.test.JobTestHelper;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.ActivitiRule;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.toxos.activiti.assertion.ProcessAssert;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.test.JobTestHelper;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.FlowableRule;
+import org.flowable.idm.api.User;
 
 /**
  * Builds and runs process acceptance test cases using a fluent API.
  *
  * @author Tim Stephenson
  */
-public class ActivitiSpec {
+public class BpmSpec {
 
     private static final Set<String> emptySet = new HashSet<String>();
 
-    private ActivitiRule activitiRule;
+    private FlowableRule flowableRule;
 
     private String specName;
 
@@ -68,10 +72,12 @@ public class ActivitiSpec {
 
     private String processDefinitionKey;
 
-    public ActivitiSpec(ActivitiRule activitiRule, String name) {
-        this.activitiRule = activitiRule;
+    public BpmSpec(FlowableRule flowableRule, String name) {
+        this.flowableRule = flowableRule;
         this.specName = name;
+
         this.collectVars = new HashMap<String, Object>();
+		processEngine = flowableRule.getProcessEngine();
         writeBddPhrase("Instantiated specification for scenario %1$s", specName);
     }
 
@@ -80,7 +86,7 @@ public class ActivitiSpec {
      *            Natural language definition of scenario pre-conditions.
      * @return
      */
-    public ActivitiSpec given(String preCondition) {
+    public BpmSpec given(String preCondition) {
         writeBddPhrase("%1$sGIVEN: %2$s", System.getProperty("line.separator"),
                 preCondition);
         return this;
@@ -123,7 +129,7 @@ public class ActivitiSpec {
         return processInstance;
     }
 
-    public ActivitiSpec whenEventOccurs(String eventDescription, String key,
+    public BpmSpec whenEventOccurs(String eventDescription, String key,
             Set<String> collectVars, Map<String, Object> putVars) {
         this.processDefinitionKey = key;
 
@@ -131,7 +137,7 @@ public class ActivitiSpec {
         for (Entry<String, Object> entry : putVars.entrySet()) {
             vars.put(entry.getKey(), entry.getValue());
         }
-        processInstance = activitiRule.getRuntimeService()
+        processInstance = flowableRule.getRuntimeService()
                 .startProcessInstanceByKey(processDefinitionKey, vars);
         assertNotNull(processInstance);
         assertNotNull(processInstance.getId());
@@ -155,7 +161,7 @@ public class ActivitiSpec {
      *            Process tenant, may be null.
      * @return The updated specification.
      */
-    public ActivitiSpec whenEventOccurs(String eventDescription, String key,
+    public BpmSpec whenEventOccurs(String eventDescription, String key,
             Set<String> collectVars, Map<String, Object> putVars,
             String tenantId) {
         this.processDefinitionKey = key;
@@ -164,7 +170,7 @@ public class ActivitiSpec {
         for (Entry<String, Object> entry : putVars.entrySet()) {
             vars.put(entry.getKey(), entry.getValue());
         }
-        processInstance = activitiRule.getRuntimeService()
+        processInstance = flowableRule.getRuntimeService()
                 .startProcessInstanceByKeyAndTenantId(processDefinitionKey,
                         vars, tenantId);
         assertNotNull(processInstance);
@@ -189,7 +195,7 @@ public class ActivitiSpec {
      *            Process tenant, may be null.
      * @return The updated specification.
      */
-    public ActivitiSpec whenMsgReceived(String eventDescription,
+    public BpmSpec whenMsgReceived(String eventDescription,
             String msgName, String messageResource, String tenantId) {
         this.messageName = msgName;
 
@@ -197,7 +203,7 @@ public class ActivitiSpec {
         vars.put("messageName", adapt(msgName));
         vars.put(adapt(messageName), getJson(messageResource));
 
-        processInstance = activitiRule.getRuntimeService()
+        processInstance = flowableRule.getRuntimeService()
                 .startProcessInstanceByMessageAndTenantId(msgName, vars,
                         tenantId);
         assertNotNull(processInstance);
@@ -223,7 +229,7 @@ public class ActivitiSpec {
      *            Process tenant, may be null.
      * @return The updated specification.
      */
-    public ActivitiSpec whenFollowUpMsgReceived(String eventDescription,
+    public BpmSpec whenFollowUpMsgReceived(String eventDescription,
             String msgName, String messageResource, String tenantId) {
         this.messageName = msgName;
 
@@ -231,7 +237,7 @@ public class ActivitiSpec {
         vars.put("messageName", adapt(msgName));
         vars.put(adapt(messageName), getJson(messageResource));
 
-        activitiRule.getRuntimeService().signal(processInstance.getId(), vars);
+//        flowableRule.getRuntimeService().signal(processInstance.getId(), vars);
 
         writeBddPhrase("WHEN: %1$s", eventDescription);
         return this;
@@ -275,12 +281,12 @@ public class ActivitiSpec {
      *            Variable names to collect in the scenario.
      * @return The updated specification.
      */
-    public ActivitiSpec thenScriptTask(String taskDefinitionKey,
+    public BpmSpec thenScriptTask(String taskDefinitionKey,
             Set<String> collectVars) {
         return thenServiceTask(taskDefinitionKey, collectVars);
     }
 
-    public ActivitiSpec thenScriptTask(String taskDefinitionKey) {
+    public BpmSpec thenScriptTask(String taskDefinitionKey) {
         return thenServiceTask(taskDefinitionKey, emptySet);
     }
 
@@ -297,9 +303,9 @@ public class ActivitiSpec {
      *            Variable names to collect in the scenario.
      * @return The updated specification.
      */
-    public ActivitiSpec thenServiceTask(String taskDefinitionKey,
+    public BpmSpec thenServiceTask(String taskDefinitionKey,
             Set<String> collectVars) {
-        List<HistoricTaskInstance> tasks = activitiRule.getHistoryService()
+        List<HistoricTaskInstance> tasks = flowableRule.getHistoryService()
                 .createHistoricTaskInstanceQuery()
                 .taskDefinitionKey(taskDefinitionKey).list();
 
@@ -315,7 +321,7 @@ public class ActivitiSpec {
         return this;
     }
 
-    public ActivitiSpec thenServiceTask(String taskDefinitionKey) {
+    public BpmSpec thenServiceTask(String taskDefinitionKey) {
         return thenServiceTask(taskDefinitionKey, emptySet);
     }
 
@@ -334,9 +340,9 @@ public class ActivitiSpec {
      *            Variables to be injected into the process context.
      * @return The updated specification.
      */
-    public ActivitiSpec thenUserTask(String taskDefinitionKey,
+    public BpmSpec thenUserTask(String taskDefinitionKey,
             Set<String> collectVars, Map<String, Object> putVars) {
-        Task task = activitiRule.getTaskService().createTaskQuery()
+        Task task = flowableRule.getTaskService().createTaskQuery()
                 .singleResult();
         assertNotNull("Did not find the expected task with key "
                 + taskDefinitionKey, task);
@@ -351,9 +357,9 @@ public class ActivitiSpec {
             vars.put(entry.getKey(), entry.getValue());
         }
 
-        activitiRule.getTaskService().complete(task.getId(), vars, false);
+        flowableRule.getTaskService().complete(task.getId(), vars, false);
         for (Entry<String, Object> entry : putVars.entrySet()) {
-            ProcessAssert.assertProcessVariableLatestValueEquals(
+            assertProcessVariableLatestValueEquals(
                     processInstance, entry.getKey(), entry.getValue());
         }
         writeBddPhrase("THEN: User Task '%1$s' is created and completed",
@@ -372,7 +378,7 @@ public class ActivitiSpec {
      * @return The updated specification.
      * @throws Exception
      */
-    public ActivitiSpec thenExtension(ExternalAction action) throws Exception {
+    public BpmSpec thenExtension(ExternalAction action) throws Exception {
         action.execute(this);
         writeBddPhrase("THEN: extension '%1$s' is run", action.getClass()
                 .getName());
@@ -387,10 +393,10 @@ public class ActivitiSpec {
      *            Maximum milli-seconds to allow the engine to execute.
      * @return The updated specification.
      */
-    public ActivitiSpec whenExecuteJobsForTime(int maxMillisToWait) {
-        JobTestHelper.executeJobExecutorForTime(activitiRule, maxMillisToWait, 1);
+    public BpmSpec whenExecuteJobsForTime(int maxMillisToWait) {
+        JobTestHelper.executeJobExecutorForTime(flowableRule, maxMillisToWait, 1);
 
-        List<Job> jobs = activitiRule.getManagementService().createJobQuery()
+        List<Job> jobs = flowableRule.getManagementService().createJobQuery()
                 .list();
         writeBddPhrase("WHEN: executed jobs for %1$d, %2$d jobs remained",
                 maxMillisToWait, jobs.size());
@@ -406,10 +412,10 @@ public class ActivitiSpec {
      *            Maximum milli-seconds to allow the engine to execute.
      * @return The updated specification.
      */
-    public ActivitiSpec whenExecuteAllJobs(int timeout) {
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(activitiRule
+    public BpmSpec whenExecuteAllJobs(int timeout) {
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(flowableRule
                 .getProcessEngine().getProcessEngineConfiguration(),
-                activitiRule.getManagementService(), timeout, 1);
+                flowableRule.getManagementService(), timeout, 1);
         writeBddPhrase("WHEN: executed all jobs");
         return this;
     }
@@ -425,14 +431,14 @@ public class ActivitiSpec {
      * @see <a
      *      href="https://docs.oracle.com/javase/6/docs/api/java/util/Calendar.html">java.util.Calendar</a>
      */
-    public ActivitiSpec whenProcessTimePassed(int field, int amount) {
-        Calendar cal = activitiRule.getProcessEngine()
+    public BpmSpec whenProcessTimePassed(int field, int amount) {
+        Calendar cal = flowableRule.getProcessEngine()
                 .getProcessEngineConfiguration().getClock()
                 .getCurrentCalendar();
         cal.add(field, amount);
         Date time = cal.getTime();
         writeBddPhrase("WHEN: process time advanced to : %1$s", time.toString());
-        activitiRule.setCurrentTime(time);
+        flowableRule.setCurrentTime(time);
         return this;
     }
 
@@ -445,7 +451,7 @@ public class ActivitiSpec {
      *            been invoked.
      * @return The updated specification.
      */
-    public ActivitiSpec thenSubProcessCalled(String subProcDefKey) {
+    public BpmSpec thenSubProcessCalled(String subProcDefKey) {
         if (subProcDefKey == null) {
             throw new IllegalArgumentException("Parameter subProcId must not be null");
         }
@@ -458,7 +464,7 @@ public class ActivitiSpec {
     }
 
     private boolean searchForSubProc(String subProcDefKey, String procId) {
-        List<HistoricProcessInstance> childProcessInstances = activitiRule
+        List<HistoricProcessInstance> childProcessInstances = flowableRule
                 .getHistoryService().createHistoricProcessInstanceQuery()
                 .superProcessInstanceId(procId).list();
 
@@ -480,8 +486,8 @@ public class ActivitiSpec {
      * 
      * @return The updated specification.
      */
-    public ActivitiSpec thenProcessIsComplete() {
-        ProcessAssert.assertProcessEnded(processInstance);
+    public BpmSpec thenProcessIsComplete() {
+        assertProcessEnded(processInstance);
         writeBddPhrase("THEN: The process is complete");
         return this;
     }
@@ -493,12 +499,12 @@ public class ActivitiSpec {
      * @param endEventId
      * @return The updated specification.
      */
-    public ActivitiSpec thenProcessEndedAndInEndEvents(String... endEventIds) {
-        ProcessAssert.assertProcessEndedAndInEndEvents(processInstance,
+    public BpmSpec thenProcessEndedAndInEndEvents(String... endEventIds) {
+        assertProcessEndedAndInEndEvents(processInstance,
                 endEventIds);
         writeBddPhrase(
                 "THEN: The process is complete and finished in these events %1$s",
-                endEventIds);
+                (Object[]) endEventIds);
         return this;
     }
 
@@ -509,18 +515,18 @@ public class ActivitiSpec {
      * @param endEventId
      * @return The updated specification.
      */
-    public ActivitiSpec thenProcessEndedAndInExclusiveEndEvent(String endEventId) {
-        // ProcessInstance processInstance2 = activitiRule.getProcessEngine()
+    public BpmSpec thenProcessEndedAndInExclusiveEndEvent(String endEventId) {
+        // ProcessInstance processInstance2 = flowableRule.getProcessEngine()
         // .getRuntimeService().createProcessInstanceQuery()
         // .processInstanceId(processInstance.getId()).singleResult();
-        HistoricProcessInstance processInstance2 = activitiRule
+        HistoricProcessInstance processInstance2 = flowableRule
                 .getProcessEngine().getHistoryService()
                 .createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(processInstance2);
         assertNotNull(processInstance2.getEndTime());
 
-        ProcessAssert.assertProcessEndedAndInExclusiveEndEvent(processInstance,
+        assertProcessEndedAndInExclusiveEndEvent(processInstance,
                 endEventId);
         writeBddPhrase(
                 "THEN: The process is complete and in the end event %1$s",
@@ -529,30 +535,30 @@ public class ActivitiSpec {
     }
 
 
-    public ActivitiSpec thenTimerExpired(String timerEventId) {
-        List<HistoricActivityInstance> activities = activitiRule
+    public BpmSpec thenTimerExpired(String timerEventId) {
+        List<HistoricActivityInstance> flowablees = flowableRule
                 .getHistoryService().createHistoricActivityInstanceQuery()
                 .activityId(timerEventId).list();
-        assertEquals(1, activities.size());
+        assertEquals(1, flowablees.size());
         writeBddPhrase("THEN: The timer %1$s expired", timerEventId);
         return this;
     }
 
-    public ActivitiSpec thenUserExists(String userId, String... groupIds) {
-        User user = activitiRule.getIdentityService().createUserQuery()
+    public BpmSpec thenUserExists(String userId, String... groupIds) {
+        User user = flowableRule.getIdentityService().createUserQuery()
                 .userId(userId).singleResult();
         assertNotNull(user);
 
         for (String groupId : groupIds) {
-            assertTrue(activitiRule.getIdentityService().createGroupQuery()
+            assertTrue(flowableRule.getIdentityService().createGroupQuery()
                     .groupId(groupId).count() > 0);
         }
         writeBddPhrase("THEN: The user %1$s exists", userId);
         return this;
     }
 
-    public ActivitiSpec thenUserAuthenticated(String userId, String newPwd) {
-        activitiRule.getIdentityService().checkPassword(userId, newPwd);
+    public BpmSpec thenUserAuthenticated(String userId, String newPwd) {
+        flowableRule.getIdentityService().checkPassword(userId, newPwd);
         return this;
     }
 
@@ -561,14 +567,14 @@ public class ActivitiSpec {
      * @param varName
      * @return The updated specification.
      */
-    public ActivitiSpec collectVar(String varName) {
+    public BpmSpec collectVar(String varName) {
         Object var = null;
         try {
-            var = activitiRule.getRuntimeService().getVariable(
+            var = flowableRule.getRuntimeService().getVariable(
                 processInstance.getId(), varName);
-        } catch (ActivitiObjectNotFoundException e) {
+        } catch (FlowableObjectNotFoundException e) {
             // assume process ended, try history
-            var = activitiRule.getHistoryService()
+            var = flowableRule.getHistoryService()
                     .createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstance.getId())
                     .variableName(varName).singleResult().getValue();

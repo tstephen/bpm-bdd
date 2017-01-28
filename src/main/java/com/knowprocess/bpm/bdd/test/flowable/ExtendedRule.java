@@ -1,4 +1,4 @@
-package org.activiti.bdd.test.activiti;
+package com.knowprocess.bpm.bdd.test.flowable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -10,27 +10,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.form.TaskFormData;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.ActivitiRule;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.form.TaskFormData;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.runtime.Job;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.test.FlowableRule;
 
 /**
  * Provides observation and assertion support for tasks created within process
- * tests. Consider submitting as patch to Activiti.
+ * tests.
  * 
- * @author tstephen
+ * @author Tim Stephenson
  * 
  */
-public class ExtendedRule extends ActivitiRule {
+public class ExtendedRule extends FlowableRule {
     public static final int DEFAULT_PRIORITY = 50;
-    private Map<String, Object> emptyData = Collections.emptyMap();
+    protected final Map<String, Object> emptyData = Collections.emptyMap();
 
     public ExtendedRule(String alternateConfig) {
         super(alternateConfig);
@@ -201,6 +201,7 @@ public class ExtendedRule extends ActivitiRule {
 
         // Note, do not get local vars here, no need (yet): YAGNI
         Map<String, Object> vars = taskService.getVariables(task.getId());
+        assertNotNull(vars);
         // TODO comment this whilst working on TaskRank
         // assertEquals(priority, task.getPriority());
 

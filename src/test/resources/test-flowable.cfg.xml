@@ -5,13 +5,13 @@
 
   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
     <property name="defaultAutoCommit" value="false" />
-    <property name="url" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+    <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
     <property name="driverClassName" value="org.h2.Driver" />
     <property name="username" value="sa" />
     <property name="password" value="" />
   </bean>
 
-  <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
     <property name="dataSource" ref="dataSource" />
     
     <!-- Database configurations -->
@@ -21,8 +21,8 @@
         job executor configurations 
         NOTE this must be true to evaluate timers. 
     -->
-    <property name="jobExecutorActivate" value="true" />
-    
+    <property name="asyncExecutorActivate" value="true" />
+
     <!-- history configuration, 'audit' is default -->
     <property name="history" value="full" />    
   </bean>

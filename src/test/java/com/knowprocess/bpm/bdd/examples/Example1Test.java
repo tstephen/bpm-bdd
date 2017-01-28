@@ -11,19 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Activiti Behaviour Driven Development (BDD) library
+ * BPM Behaviour Driven Development (BDD) library
  * Copyright 2015 Tim Stephenson
  * 
  *******************************************************************************/
-package org.activiti.bdd.examples;
+package com.knowprocess.bpm.bdd.examples;
 
-import org.activiti.bdd.ActivitiSpec;
-import org.activiti.engine.test.ActivitiRule;
+import com.knowprocess.bpm.bdd.BpmSpec;
+import org.flowable.engine.test.FlowableRule;
 import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Simplest possible example specification using Activiti BDD.
+ * Simplest possible example specification using BPM BDD.
  *
  * @author Tim Stephenson
  */
@@ -32,19 +32,19 @@ public class Example1Test {
     private static final String EXAMPLE1_KEY = "Example1";
 
     @Rule
-    public ActivitiRule activitiRule = new ActivitiRule("test-activiti.cfg.xml");
+    public FlowableRule flowableRule = new FlowableRule("test-flowable.cfg.xml");
 
     @SuppressWarnings("unchecked")
     @Test
-    @org.activiti.engine.test.Deployment(resources = { "processes/Example1.bpmn" })
+    @org.flowable.engine.test.Deployment(resources = { "processes/Example1.bpmn" })
     public void testExample1() throws Exception {
-        new ActivitiSpec(activitiRule, "testExample1")
+        new BpmSpec(flowableRule, "testExample1")
                 .given("No particular pre-conditions")
                 .whenEventOccurs("The Example1 process is started",
-                        EXAMPLE1_KEY, ActivitiSpec.buildSet(),
-                        ActivitiSpec.buildMap(), null)
-                .thenUserTask("doSomething", ActivitiSpec.buildSet(),
-                        ActivitiSpec.buildMap())
+                        EXAMPLE1_KEY, BpmSpec.buildSet(),
+                        BpmSpec.buildMap(), null)
+                .thenUserTask("doSomething", BpmSpec.buildSet(),
+                        BpmSpec.buildMap())
                 .thenProcessIsComplete();
 
     }

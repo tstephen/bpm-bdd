@@ -11,26 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * Activiti Behaviour Driven Development (BDD) library
+ * BPM Behaviour Driven Development (BDD) library
  * Copyright 2015 Tim Stephenson
  *
  *******************************************************************************/
-package org.activiti.bdd;
+package com.knowprocess.bpm.bdd;
 
 /**
  * Extension interface allowing specification to include custom behaviour in
- * addition to Activiti calls.
+ * addition to process engine calls.
  *
  * @author Tim Stephenson
  */
 public interface ExternalAction {
 
     /**
-     * @param activitiSpec
-     *            Access all Activiti services as well as scenario
+     * @param spec
+     *            Access all process engine services as well as scenario
      *            specification.
      * @throws Exception
      *             If scenario does not execute as expected.
      */
-    void execute(ActivitiSpec activitiSpec) throws Exception;
+    void execute(BpmSpec spec) throws Exception;
 }

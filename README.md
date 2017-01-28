@@ -1,7 +1,7 @@
-Activiti BDD
+BPM BDD
 =============================
 
-A library to support [Behaviour Driven Development](https://en.wikipedia.org/wiki/Behavior-driven_development) of business processes with the [Activiti BPMN engine](http://activiti.org). 
+A library to support [Behaviour Driven Development](https://en.wikipedia.org/wiki/Behavior-driven_development) of business processes with the [Flowable BPMN engine](http://flowable.org). 
 
 Installation
 =============================
@@ -14,7 +14,7 @@ At this stage it is necessary to build the library from source:
 1. Clone source: 
 
    ```
-   git clone https://github.com/tstephen/activiti-bdd.git
+   git clone https://github.com/Tim Stephenson/flowable-bdd.git
    ```
 
 2. Build and install in local maven repo: 
@@ -43,17 +43,17 @@ Usage
 2. A fluent Java API enables a highly readable translation of the spec to an executable form.
 
     ```java
-    new ActivitiSpec(activitiRule, "testExample1")
+    new FlowableSpec(flowableRule, "testExample1")
         .given("No particular pre-conditions")
         .whenEventOccurs("The Example1 process is started",
                 EXAMPLE1_KEY, 
-                ActivitiSpec.buildSet(),
-                ActivitiSpec.buildMap(), 
+                FlowableSpec.buildSet(),
+                FlowableSpec.buildMap(), 
                 null)
         .thenUserTask("doSomething", 
-                ActivitiSpec.buildSet(),
-                ActivitiSpec.buildMap())
+                FlowableSpec.buildSet(),
+                FlowableSpec.buildMap())
         .thenProcessIsComplete();
     ```
     
-3. Embedding within a JUnit test provides a simple way to integrate the specification into continuous integration and deployment environments. See [Example1.java](https://github.com/tstephen/activiti-bdd/blob/master/src/test/java/org/activiti/bdd/examples/Example1Test.java) for the complete class. 
+3. Embedding within a JUnit test provides a simple way to integrate the specification into continuous integration and deployment environments. See [Example1.java](https://github.com/Tim Stephenson/flowable-bdd/blob/master/src/test/java/org/flowable/bdd/examples/Example1Test.java) for the complete class. 
