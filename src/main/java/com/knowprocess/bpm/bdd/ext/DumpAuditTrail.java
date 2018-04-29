@@ -22,11 +22,11 @@ public class DumpAuditTrail implements ExternalAction {
     public void execute(BpmSpec spec) throws Exception {
         System.out.println("Audit trail: ");
 
-        List<HistoricActivityInstance> flowablees = flowableRule
+        List<HistoricActivityInstance> activities = flowableRule
                 .getHistoryService().createHistoricActivityInstanceQuery()
                 .processInstanceId(spec.getProcessInstance().getId()).list();
 
-        for (HistoricActivityInstance hist : flowablees) {
+        for (HistoricActivityInstance hist : activities) {
             System.out.println(String.format("  : %1$s", hist));
         }
 

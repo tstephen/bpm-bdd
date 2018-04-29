@@ -98,7 +98,7 @@ public class TestMailServer extends ExternalResource {
             String subject, String txtMessage, String from, List<String> to,
 			List<String> cc) throws IOException, MessagingException {
 		if (htmlMail) {
-			assertTrue(mimeMessage.getContentType().contains("multipart/mixed"));
+			assertTrue(mimeMessage.getContentType().contains("multipart/alternative"));
 		} else {
 			assertTrue(mimeMessage.getContentType().contains("text/plain"));
 		}

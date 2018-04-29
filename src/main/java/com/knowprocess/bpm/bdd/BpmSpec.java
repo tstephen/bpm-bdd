@@ -43,13 +43,12 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.test.JobTestHelper;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.FlowableRule;
 import org.flowable.idm.api.User;
+import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 
 /**
  * Builds and runs process acceptance test cases using a fluent API.
@@ -305,11 +304,11 @@ public class BpmSpec {
      */
     public BpmSpec thenServiceTask(String taskDefinitionKey,
             Set<String> collectVars) {
-        List<HistoricTaskInstance> tasks = flowableRule.getHistoryService()
-                .createHistoricTaskInstanceQuery()
-                .taskDefinitionKey(taskDefinitionKey).list();
+        List<HistoricActivityInstance> tasks = flowableRule.getHistoryService()
+                .createHistoricActivityInstanceQuery()
+                .activityId(taskDefinitionKey).list();
 
-        assertTrue("Did not find the expected task with key "
+        assertTrue("Did not find the expected task with id "
                 + taskDefinitionKey, tasks.size() != 0);
 
         for (String varName : collectVars) {

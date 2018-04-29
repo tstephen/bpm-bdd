@@ -13,13 +13,13 @@ import java.util.Map;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
-import org.flowable.engine.task.IdentityLink;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.FlowableRule;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * Provides observation and assertion support for tasks created within process
